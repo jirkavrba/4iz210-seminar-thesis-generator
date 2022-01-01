@@ -15,13 +15,13 @@ class FulltextSearchTaskGenerator {
 
         // Compute term-frequency in all documents
         // Outputs a 2D array with the following indexing: termFrequency[term][document]
-        val termFrequency = terms.map { term -> documents.map { occurrences(it, term) } }
-
-        // Sum up each column determining maximal number of term occurrences among all documents
-        val totals = termFrequency.reduce { accumulator, current -> accumulator.mapIndexed { index, value -> value + current[index] } }
+        val termFrequency = terms.map { term -> documents.map { occurrences(it, term).toDouble() } }
+        val maxOccurrences = termFrequency.reduce { accumulator, current ->
+            accumulator.mapIndexed { index, value -> maxOf(value, current[index]) }
+        }
 
         // Normalise the computed term-frequency by diving each cell value with the max of the given document
-        val normalisedTermFrequency = termFrequency.mapIndexed { index, term -> term.map { it / totals[index] } }
+        val normalisedTermFrequency = termFrequency.map { it.mapIndexed { index, value -> value / maxOccurrences[index] } }
 
         TODO("Implement task solution generator")
     }

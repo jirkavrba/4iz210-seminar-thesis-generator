@@ -21,7 +21,7 @@ class GeneratorController(private val service: ThesisGeneratorService) {
         @Max(5)
         val inputs: List<String>,
 
-        // Map of "base query" -> ["variants"]
+        // Map of "base query" -> ["variations"]
         @Min(5)
         val query: Map<String, List<String>>,
 

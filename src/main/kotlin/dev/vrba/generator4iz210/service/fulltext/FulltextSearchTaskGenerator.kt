@@ -1,6 +1,7 @@
 package dev.vrba.generator4iz210.service.fulltext
 
 import org.springframework.stereotype.Component
+import kotlin.math.log10
 
 @Component
 class FulltextSearchTaskGenerator {
@@ -22,6 +23,13 @@ class FulltextSearchTaskGenerator {
 
         // Normalise the computed term-frequency by diving each cell value with the max of the given document
         val normalisedTermFrequency = termFrequency.map { it.mapIndexed { index, value -> value / maxOccurrences[index] } }
+
+        // Compute document frequencies and inverted document frequencies for each term
+        val documentFrequencies = terms.map { term -> documents.count { occurrences(it, term) > 0 } / documents.size.toDouble() }
+        val invertedDocumentFrequencies = documentFrequencies.map {
+            if (it == 1.0) 0.0 // Special case for division by zero
+            else log10(1.0 / it)
+        }
 
         TODO("Implement task solution generator")
     }

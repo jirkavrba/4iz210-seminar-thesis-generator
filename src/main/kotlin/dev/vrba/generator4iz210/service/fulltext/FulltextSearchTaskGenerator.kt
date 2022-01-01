@@ -2,6 +2,7 @@ package dev.vrba.generator4iz210.service.fulltext
 
 import org.springframework.stereotype.Component
 import kotlin.math.log10
+import kotlin.math.sqrt
 
 @Component
 class FulltextSearchTaskGenerator {
@@ -35,7 +36,17 @@ class FulltextSearchTaskGenerator {
         // Again, the indexing is the following: tfidf[term][document]
         val tfidf = normalisedTermFrequency.mapIndexed { index, term -> term.map { it * invertedDocumentFrequencies[index] } }
 
-        TODO("Implement task solution generator")
+        // Finally, compute a cosine similarity for each document
+        val cosineSimilarity = documents.indices.map { index ->
+            val values = tfidf.map { it[index] }
+
+            val numerator = values.zip(invertedDocumentFrequencies).sumOf { (a, b) -> a * b }
+            val denominator = sqrt(values.sumOf { it * it }) * sqrt(invertedDocumentFrequencies.sumOf { it * it })
+
+            numerator / denominator
+        }
+
+        TODO("Implement the rest")
     }
 
     private fun occurrences(document: List<String>, term: String): Int =

@@ -46,7 +46,19 @@ class FulltextSearchTaskGenerator {
             numerator / denominator
         }
 
-        TODO("Implement the rest")
+        // D1, D2, ...
+        val documentHeaders = documents.indices.map { "D${it + 1}" }
+
+        return FulltextSearchTaskOutput(
+            DocumentTable(
+                headers = listOf("Term", "Query") + documentHeaders,
+                rows = termFrequency.mapIndexed { index, row -> listOf(terms[index], "1") + row.map { it.toInt().toString() } }
+            ),
+            DocumentTable(listOf(), listOf()),
+            DocumentTable(listOf(), listOf()),
+            DocumentTable(listOf(), listOf()),
+            DocumentTable(listOf(), listOf()),
+        )
     }
 
     private fun occurrences(document: List<String>, term: String): Int =

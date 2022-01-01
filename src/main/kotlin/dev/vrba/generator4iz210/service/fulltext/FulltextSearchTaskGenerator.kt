@@ -31,6 +31,10 @@ class FulltextSearchTaskGenerator {
             else log10(1.0 / it)
         }
 
+        // Compute the final tfidf indexes used for constructing the vector space
+        // Again, the indexing is the following: tfidf[term][document]
+        val tfidf = normalisedTermFrequency.mapIndexed { index, term -> term.map { it * invertedDocumentFrequencies[index] } }
+
         TODO("Implement task solution generator")
     }
 

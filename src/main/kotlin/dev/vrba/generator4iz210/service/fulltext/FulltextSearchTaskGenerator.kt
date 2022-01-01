@@ -1,7 +1,6 @@
 package dev.vrba.generator4iz210.service.fulltext
 
 import org.springframework.stereotype.Component
-import kotlin.math.log2
 
 @Component
 class FulltextSearchTaskGenerator {

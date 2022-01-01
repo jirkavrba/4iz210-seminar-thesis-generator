@@ -29,7 +29,7 @@ class GeneratorController(private val service: ThesisGeneratorService) {
     )
 
     fun generateThesis(@Valid @RequestBody request: GenerateThesisRequest): ResponseEntity<*> {
-        val fulltext = service.generateFullText(request.xname, request.inputs, request.query)
+        val fulltext = service.generateFullText(request.inputs, request.query)
 
         return ResponseEntity.ok(fulltext)
     }

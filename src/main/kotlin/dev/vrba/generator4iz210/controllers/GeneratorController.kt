@@ -21,17 +21,15 @@ class GeneratorController(private val service: ThesisGeneratorService) {
         @Max(5)
         val inputs: List<String>,
 
+        // Map of "base query" -> ["variants"]
         @Min(5)
-        val query: List<String>,
-
-        @Min(5)
-        val frequencies: List<List<Int>>,
+        val query: Map<String, List<String>>,
 
         // TODO: Add regex patterns for tasks 2 and 3 + schema definition
     )
 
     fun generateThesis(@Valid @RequestBody request: GenerateThesisRequest): ResponseEntity<*> {
-        val fulltext = service.generateFullText(request.xname, request.inputs, request.query, request.frequencies)
+        val fulltext = service.generateFullText(request.xname, request.inputs, request.query)
 
         return ResponseEntity.ok(fulltext)
     }

@@ -7,7 +7,7 @@ data class DocumentTable(
 
 data class FulltextSearchTaskOutput(
     val termFrequency: DocumentTable,
-    val normalizedTermFrequency: DocumentTable,
+    val normalisedTermFrequency: DocumentTable,
     val dfIdf: DocumentTable,
     val tfIdf: DocumentTable,
     val similarity: DocumentTable

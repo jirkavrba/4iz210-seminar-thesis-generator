@@ -1,8 +1,7 @@
 package dev.vrba.generator4iz210.service.fulltext
 
 import org.springframework.stereotype.Component
-import kotlin.math.log10
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @Component
 class FulltextSearchTaskGenerator {
@@ -29,7 +28,7 @@ class FulltextSearchTaskGenerator {
         val documentFrequencies = terms.map { term -> documents.count { occurrences(it, term) > 0 } / documents.size.toDouble() }
         val invertedDocumentFrequencies = documentFrequencies.map {
             if (it == 1.0) 0.0 // Special case for division by zero
-            else log10(1.0 / it)
+            else log10(documents.size / it)
         }
 
         // Compute the final tfidf indexes used for constructing the vector space
@@ -49,15 +48,43 @@ class FulltextSearchTaskGenerator {
         // D1, D2, ...
         val documentHeaders = documents.indices.map { "D${it + 1}" }
 
+        fun Double.isInteger(): Boolean = ceil(this) == floor(this)
+        fun Double.formatToString(decimalPlaces: Int = 3): String =
+            if (this.isInteger()) this.toInt().toString()
+            else {
+                val multiplier = 10.0.pow(decimalPlaces)
+                val rounded = round(this * multiplier) / multiplier
+
+                rounded.toString()
+            }
+
         return FulltextSearchTaskOutput(
             DocumentTable(
                 headers = listOf("Term", "Query") + documentHeaders,
                 rows = termFrequency.mapIndexed { index, row -> listOf(terms[index], "1") + row.map { it.toInt().toString() } }
             ),
-            DocumentTable(listOf(), listOf()),
-            DocumentTable(listOf(), listOf()),
-            DocumentTable(listOf(), listOf()),
-            DocumentTable(listOf(), listOf()),
+            DocumentTable(
+                headers = listOf("Term", "Query") + documentHeaders,
+                rows = normalisedTermFrequency.mapIndexed { index, row -> listOf(terms[index], "1") + row.map { it.formatToString() } }
+            ),
+            DocumentTable(
+                headers = listOf("Term", "DF", "IDF"),
+                rows = terms.indices.map {
+                    listOf(terms[it], documentFrequencies[it].formatToString(), invertedDocumentFrequencies[it].formatToString())
+                }
+            ),
+            DocumentTable(
+                headers = listOf("Term", "Q") + documentHeaders,
+                rows = tfidf.mapIndexed { index, row ->
+                    listOf(terms[index], invertedDocumentFrequencies[index].formatToString()) + row.map { it.formatToString() }
+                }
+            ),
+            DocumentTable(
+                headers = listOf("Query") + documentHeaders,
+                rows = listOf(
+                    listOf(terms.joinToString(" ")) + cosineSimilarity.map { it.formatToString() }
+                )
+            ),
         )
     }
 

@@ -24,7 +24,7 @@ class FulltextSearchTaskGeneratorTests {
             DocumentTable(
                 headers = listOf("Term", "Query", "D1", "D2", "D3", "D4", "D5"),
                 rows = listOf(
-                    listOf("jídlo", "1", "0", "1", "0", "0", "1"),
+                    listOf("jídlo",  "1", "0", "1", "0", "0", "1"),
                     listOf("kachna", "1", "3", "2", "2", "0", "1"),
                     listOf("králík", "1", "0", "0", "1", "1", "0"),
                     listOf("peking", "1", "0", "1", "0", "0", "1"),
@@ -32,6 +32,58 @@ class FulltextSearchTaskGeneratorTests {
                 )
             ),
             output.termFrequency
+        )
+
+        assertEquals(
+            DocumentTable(
+                headers = listOf("Term", "Query", "D1", "D2", "D3", "D4", "D5"),
+                rows = listOf(
+                    listOf("jídlo",  "1", "0", "0.5", "0", "0", "1"),
+                    listOf("kachna", "1", "1", "1", "1", "0", "1"),
+                    listOf("králík", "1", "0", "0", "0.5", "1", "0"),
+                    listOf("peking", "1", "0", "0.5", "0", "0", "1"),
+                    listOf("recept", "1", "0", "0", "0.5", "1", "1"),
+                )
+            ),
+            output.normalisedTermFrequency
+        )
+
+        assertEquals(
+            DocumentTable(
+                headers = listOf("Term", "DF", "IDF"),
+                rows = listOf(
+                    listOf("jídlo",  "0.4", "1.097"),
+                    listOf("kachna", "0.8", "0.796"),
+                    listOf("králík", "0.4", "1.097"),
+                    listOf("peking", "0.4", "1.097"),
+                    listOf("recept", "0.6", "0.921"),
+                )
+            ),
+            output.dfIdf
+        )
+
+        assertEquals(
+            DocumentTable(
+                headers = listOf("Term", "Q", "D1", "D2", "D3", "D4", "D5"),
+                rows = listOf(
+                    listOf("jídlo",  "1.097", "0", "0.548", "0", "0", "1.097"),
+                    listOf("kachna", "0.796", "0.796", "0.796", "0.796", "0", "0.796"),
+                    listOf("králík", "1.097", "0", "0", "0.548", "1.097", "0"),
+                    listOf("peking", "1.097", "0", "0.548", "0", "0", "1.097"),
+                    listOf("recept", "0.921", "0", "0", "0.46", "0.921", "0.921"),
+                )
+            ),
+            output.tfIdf
+        )
+
+        assertEquals(
+            DocumentTable(
+                headers = listOf("Query", "D1", "D2", "D3", "D4", "D5"),
+                rows = listOf(
+                    listOf("jídlo kachna králík peking recept", "0.353", "0.732", "0.687", "0.635", "0.874")
+                )
+            ),
+            output.similarity
         )
     }
 }

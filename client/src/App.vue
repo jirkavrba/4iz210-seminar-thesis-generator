@@ -79,6 +79,63 @@
       </div>
     </div>
 
+    <div v-if="query.length >= 5">
+      <hr>
+
+      <div class="container">
+        <h2 class="title is-3">Regulární výrazy</h2>
+        <p>5 regulárních výrazů, které budou z dokumentů extrahovat informace.</p>
+
+        <button class="button is-info my-5" @click="addPattern()" :disabled="patterns.length >= 5">Přidat regulární výraz</button>
+
+        <p v-if="patterns.length === 0" class="has-text-grey-light">Zatím nejsou přidané žádné regulární výrazy</p>
+        <div v-else class="mb-5">
+          <div class="tabs is-centered">
+            <ul>
+              <li v-for="(current, i) in patterns" :key="i" :class="pattern === i ? 'is-active' : ''">
+                <a href="#" @click.prevent="pattern = i">
+                  Výraz {{ i + 1 }}
+                  <code v-if="current.regex.trim().length !== 0" class="ml-2">{{ current.regex }}</code>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="columns">
+            <div class="column">
+              <label class="label">Výraz:</label>
+              <input v-model="patterns[pattern].regex" class="input">
+
+              <label class="label mt-2">Popis výrazu:</label>
+              <input v-model="patterns[pattern].description" class="input">
+
+              <label class="label mt-2">XML šablona:</label>
+              <textarea v-model="patterns[pattern].xml" class="textarea is-family-monospace"
+                        placeholder="<RESOLUTION><WIDTH>(1)</WIDTH><HEIGHT>(2)</HEIGHT></RESOLUTION>"
+              ></textarea>
+              <small>Pro referenci group ve výrazu použij syntaxi <code>(1)</code> pro první skupinu, <code>(2)</code> pro druhou...</small>
+            </div>
+            <div class="column">
+              <div>
+                Náhled výstupu dotazu pro
+                <div class="select is-small">
+                <select v-model="reference">
+                  <option v-for="(_, i) in inputs" :key="i" :value="i">Dokument {{ i + 1}}</option>
+                </select>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <code>
+                  {{ patternReference() }}
+                </code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -102,6 +159,27 @@ export default {
       {
         term: "bluetooth",
         variations: []
+      },
+      {
+        term: "intel",
+        variations: []
+      },
+      {
+        term: "core",
+        variations: []
+      },
+      {
+        term: "pentium",
+        variations: []
+      }
+    ],
+    pattern: 0,
+    reference: 0,
+    patterns: [
+      {
+        regex: "(\\d+)x(\\d+)",
+        description: "Rozlišení monitoru",
+        xml: "<RESOLUTION><WIDTH>(1)</WIDTH><HEIGHT>(2)</HEIGHT></RESOLUTION>"
       }
     ]
   }),
@@ -126,6 +204,21 @@ export default {
     },
     removeVariation(term, variation) {
       this.query[term].variations.splice(variation, 1);
+    },
+    addPattern() {
+      this.patterns.push({
+        regex: "",
+        description: "",
+        xml: ""
+      });
+    },
+    patternReference() {
+      const document = this.inputs[this.reference];
+      const pattern = this.patterns[this.pattern];
+
+      const matches = Array.from(document.matchAll(pattern.regex))[0];
+
+      return matches.reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), pattern.xml);
     },
     highlight(input) {
       return input.split(/(\s+|[,.])/)

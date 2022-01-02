@@ -1,7 +1,9 @@
 package dev.vrba.generator4iz210.controllers
 
+import dev.vrba.generator4iz210.domain.RegexXmlPattern
 import dev.vrba.generator4iz210.service.ThesisGeneratorService
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -25,12 +27,19 @@ class GeneratorController(private val service: ThesisGeneratorService) {
         @Min(5)
         val query: Map<String, List<String>>,
 
-        // TODO: Add regex patterns for tasks 2 and 3 + schema definition
+        @Min(5)
+        val patterns: List<RegexXmlPattern>
     )
 
+    @PostMapping
     fun generateThesis(@Valid @RequestBody request: GenerateThesisRequest): ResponseEntity<*> {
         val fulltext = service.generateFullText(request.inputs, request.query)
+        val extraction = service.generateExtraction(request.inputs, request.patterns)
 
-        return ResponseEntity.ok(fulltext)
+        return ResponseEntity.ok(
+            mapOf<String, Any>(
+                "fulltext" to fulltext
+            )
+        )
     }
 }

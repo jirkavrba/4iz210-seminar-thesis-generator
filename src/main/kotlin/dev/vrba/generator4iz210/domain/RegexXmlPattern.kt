@@ -6,5 +6,8 @@ data class RegexXmlPattern(
     @NotBlank
     val regex: String,
 
+    @NotBlank
+    val description: String,
+
     // TODO: Add support structure for generating XML nodes and XSD schema
 )

@@ -47,12 +47,33 @@
 
         <div v-if="query.length < 8" class="mt-5">
           <input v-model="term" class="input is-inline">
-          <button @click="addTerm()" :disabled="term.trim().length === 0" class="button is-info ml-2 is-inline">Přidat slovo</button>
+          <button @click="addTerm()" :disabled="term.trim().length === 0" class="button is-info ml-2 is-inline">Přidat
+            slovo
+          </button>
         </div>
 
+        <div class="mt-3 mb-6 columns is-centered">
+          <div class="column is-2 " v-for="(term, i) in query" :key="i">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-title">{{ term.term }}</div>
+              </div>
+              <div class="card-content">
+                <div v-if="term.variations.length === 0" class="">Žádné varianty slova</div>
+                <div v-else>
+                  <div v-for="(variation, j) in term.variations" :key="j">
+                    <b class="is-clickable has-text-danger" @click="removeVariation(i, j)">&times;</b>
+                    {{ variation }}
+                  </div>
+                </div>
 
-        <div class="mt-5">
-          <div class="my-6 columns is-centered">
+                <input v-model="variation" class="input is-small mt-2">
+                <button @click="addVariation(i)" :disabled="variation.trim().length === 0" class="button is-small is-fullwidth mt-1">Přidat variantu</button>
+              </div>
+              <div class="card-footer">
+                <a href="#" class="card-footer-item" @click.prevent="removeTerm(i)">Smazat</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -72,14 +93,15 @@ export default {
       "Ultrabook - Intel Core i3 4010U Haswell, multidotykový 13.3\" LED 1920x1080, RAM 4GB, Intel HD Graphics 4400, SSHD 500GB + 8GB cache pro zrychlení běhu OS, WiFi, Bluetooth 4.0, Webkamera, HDMI, USB 3.0, podsvícená klávesnice, Windows 8 64-bit"
     ],
     term: "",
+    variation: "",
     query: [
       {
         term: "baterie",
-        variations: [""]
+        variations: []
       },
       {
         term: "bluetooth",
-        variations: [""]
+        variations: []
       }
     ]
   }),
@@ -92,8 +114,18 @@ export default {
       this.inputs.splice(index, 1);
     },
     addTerm() {
-      this.query.push({term: this.term, variations: []});
+      this.query.push({term: this.term.toLowerCase(), variations: []});
       this.term = "";
+    },
+    removeTerm(index) {
+      this.query.splice(index, 1);
+    },
+    addVariation(index) {
+      this.query[index].variations.push(this.variation.toLowerCase());
+      this.variation = "";
+    },
+    removeVariation(term, variation) {
+      this.query[term].variations.splice(variation, 1);
     },
     highlight(input) {
       return input.split(/(\s+|[,.])/)

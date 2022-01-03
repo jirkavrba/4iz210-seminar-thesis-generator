@@ -8,20 +8,25 @@ import dev.vrba.generator4iz210.service.feed.ProductFeedTaskOutput
 import dev.vrba.generator4iz210.service.fulltext.FulltextSearchTaskGenerator
 import dev.vrba.generator4iz210.service.fulltext.FulltextSearchTaskOutput
 import org.springframework.stereotype.Service
+import java.io.File
 
 @Service
 class ThesisGeneratorService(
     private val fulltext: FulltextSearchTaskGenerator,
     private val extraction: ExtractionTaskGenerator,
     private val feed: ProductFeedTaskGenerator,
-    private val writer: ThesisOutputFileWriter
+    private val writer: ThesisOutputFileWriter,
 ) {
     fun generateThesis(xname: String, inputs: List<String>, query: Map<String, List<String>>, patterns: List<RegexXmlPattern>): String  {
         val fulltext = generateFullText(inputs, query)
         val extraction = generateExtraction(inputs, patterns)
         val feed = generateProductFeed(extraction.products, patterns)
 
-        return writer.writeAndCompressThesis(xname, inputs, fulltext, extraction, feed)
+        // Compress everything into a single zip file
+        val file = writer.writeAndCompressThesis(xname, inputs, fulltext, extraction, feed)
+
+        // And upload the file to https://transfer.sh
+        return uploadFile(file)
     }
 
     private fun generateFullText(inputs: List<String>, query: Map<String, List<String>>): FulltextSearchTaskOutput =
@@ -32,4 +37,16 @@ class ThesisGeneratorService(
 
     private fun generateProductFeed(xml: String, patterns: List<RegexXmlPattern>): ProductFeedTaskOutput =
         feed.generateTaskOutput(xml, patterns)
+
+    private fun uploadFile(file: File): String {
+        // Run the curl command as instructed on the website
+        // curl --upload-file ./hello.txt https://transfer.sh/hello.txt
+        val builder = ProcessBuilder().command("curl", "--upload-file", file.absolutePath, "https://transfer.sh/${file.name}")
+        val process = builder.start()
+        val link = process.inputReader().readLine()
+
+        process.destroy()
+
+        return link
+    }
 }

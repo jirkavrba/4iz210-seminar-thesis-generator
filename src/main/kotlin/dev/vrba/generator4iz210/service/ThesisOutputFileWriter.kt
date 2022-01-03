@@ -23,7 +23,7 @@ class ThesisOutputFileWriter {
         fulltext: FulltextSearchTaskOutput,
         extraction: ExtractionTaskOutput,
         feed: ProductFeedTaskOutput
-    ): String {
+    ): File {
         // Create a temporary directory that will be then compressed
         val directory = Files.createTempDirectory(xname).toFile()
 
@@ -61,7 +61,7 @@ class ThesisOutputFileWriter {
         // Finally, delete the temporary directory
         directory.delete()
 
-        return zip.absolutePath
+        return zip
     }
 
     private fun generateFulltextWordDocument(inputs: List<String>, fulltext: FulltextSearchTaskOutput): File {

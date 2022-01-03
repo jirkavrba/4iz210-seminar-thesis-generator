@@ -68,7 +68,9 @@
                 </div>
 
                 <input v-model="variation" class="input is-small mt-2">
-                <button @click="addVariation(i)" :disabled="variation.trim().length === 0" class="button is-small is-fullwidth mt-1">Přidat variantu</button>
+                <button @click="addVariation(i)" :disabled="variation.trim().length === 0"
+                        class="button is-small is-fullwidth mt-1">Přidat variantu
+                </button>
               </div>
               <div class="card-footer">
                 <a href="#" class="card-footer-item" @click.prevent="removeTerm(i)">Smazat</a>
@@ -86,7 +88,9 @@
         <h2 class="title is-3">Regulární výrazy</h2>
         <p>5 regulárních výrazů, které budou z dokumentů extrahovat informace.</p>
 
-        <button class="button is-info my-5" @click="addPattern()" :disabled="patterns.length >= 5">Přidat regulární výraz</button>
+        <button class="button is-info my-5" @click="addPattern()" :disabled="patterns.length >= 5">Přidat regulární
+          výraz
+        </button>
 
         <p v-if="patterns.length === 0" class="has-text-grey-light">Zatím nejsou přidané žádné regulární výrazy</p>
         <div v-else class="mb-5">
@@ -113,15 +117,16 @@
               <textarea v-model="patterns[pattern].xml" class="textarea is-family-monospace"
                         placeholder="<RESOLUTION><WIDTH>(1)</WIDTH><HEIGHT>(2)</HEIGHT></RESOLUTION>"
               ></textarea>
-              <small>Pro referenci group ve výrazu použij syntaxi <code>(1)</code> pro první skupinu, <code>(2)</code> pro druhou...</small>
+              <small>Pro referenci group ve výrazu použij syntaxi <code>(1)</code> pro první skupinu, <code>(2)</code>
+                pro druhou...</small>
             </div>
             <div class="column">
               <div>
                 Náhled výstupu dotazu pro
                 <div class="select is-small">
-                <select v-model="reference">
-                  <option v-for="(_, i) in inputs" :key="i" :value="i">Dokument {{ i + 1}}</option>
-                </select>
+                  <select v-model="reference">
+                    <option v-for="(_, i) in inputs" :key="i" :value="i">Dokument {{ i + 1 }}</option>
+                  </select>
                 </div>
               </div>
 
@@ -179,7 +184,27 @@ export default {
       {
         regex: "(\\d+)x(\\d+)",
         description: "Rozlišení monitoru",
-        xml: "<RESOLUTION><WIDTH>(1)</WIDTH><HEIGHT>(2)</HEIGHT></RESOLUTION>"
+        xml: [
+          {
+            name: "RESOLUTION",
+            type: "complex",
+            value: "",
+            children: [
+              {
+                name: "WIDTH",
+                type: "integer",
+                value: "(1)",
+                children: []
+              },
+              {
+                name: "HEIGHT",
+                type: "integer",
+                value: "(2)",
+                children: []
+              }
+            ]
+          }
+        ]
       }
     ]
   }),
@@ -209,16 +234,25 @@ export default {
       this.patterns.push({
         regex: "",
         description: "",
-        xml: ""
+        xml: {}
       });
     },
     patternReference() {
       const document = this.inputs[this.reference];
       const pattern = this.patterns[this.pattern];
 
+      const resolveTemplate = node => {
+        if (node.children.length === 0) {
+          return `<${node.name}>${node.value}</${node.name}>`;
+        }
+
+        return `<${node.name}>${node.children.map(child => resolveTemplate(child)).join("")}</${node.name}>`;
+      }
+
+      const template = pattern.xml.map(root => resolveTemplate(root)).join("");
       const matches = Array.from(document.matchAll(pattern.regex))[0];
 
-      return matches.reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), pattern.xml);
+      return matches.reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), template);
     },
     highlight(input) {
       return input.split(/(\s+|[,.])/)

@@ -3,6 +3,7 @@ package dev.vrba.generator4iz210.service
 import dev.vrba.generator4iz210.service.extraction.ExtractionTaskOutput
 import dev.vrba.generator4iz210.service.feed.ProductFeedTaskOutput
 import dev.vrba.generator4iz210.service.fulltext.FulltextSearchTaskOutput
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.UnderlinePatterns
 import org.springframework.stereotype.Component
 import java.io.File
@@ -53,6 +54,64 @@ class ThesisOutputFileWriter {
             content.isItalic = true
             content.setText(" $input")
             content.addCarriageReturn()
+        }
+
+        // Write down the query
+        val query = document.createParagraph()
+        val queryHeader = query.createRun()
+        val queryContent = query.createRun()
+
+        queryHeader.isBold = true
+        queryHeader.underline = UnderlinePatterns.SINGLE
+        queryHeader.setText("Dotaz:")
+
+        queryContent.setText(" ${fulltext.query}")
+        queryContent.addCarriageReturn()
+
+        // And finally, print out the result tables
+        val results = document.createParagraph()
+        val resultsHeader = results.createRun()
+        val resultsContent = results.createRun()
+
+        resultsHeader.isBold = true
+        resultsHeader.underline = UnderlinePatterns.SINGLE
+        resultsHeader.setText("Řešení:")
+
+        val tables = mapOf(
+            "Tabulka 1: TF" to fulltext.termFrequency,
+            "Tabulka 2: TF – normalizovaná" to fulltext.normalisedTermFrequency,
+            "Tabulka 3: DF, IDF" to fulltext.dfIdf,
+            "Tabulka 4: TF-IDF" to fulltext.tfIdf,
+            "Tabulka 5: podobnost dokument - dotaz" to fulltext.similarity
+        )
+
+        tables.forEach { (label, table) ->
+            document.createParagraph()
+
+            val container = document.createTable()
+            val headerRow = container.createRow()
+
+            container.removeRow(0)
+            headerRow.removeCell(0)
+            table.headers.forEach {
+                headerRow.createCell().apply {
+                    text = it
+
+                    paragraphs[0].alignment = ParagraphAlignment.CENTER
+                    paragraphs[0].runs[0].isBold = true
+                }
+            }
+
+            table.rows.forEach { item ->
+                val row = container.createRow()
+                item.forEachIndexed { index, content -> row.getCell(index).apply { text = content } }
+            }
+
+            val bottom = document.createParagraph()
+            val run = bottom.createRun()
+
+            run.isItalic = true
+            run.setText(label)
         }
 
         document.write(out)

@@ -58,7 +58,10 @@ class FulltextSearchTaskGenerator {
                 rounded.toString()
             }
 
+        val queryText = terms.joinToString(" ")
+
         return FulltextSearchTaskOutput(
+            queryText,
             DocumentTable(
                 headers = listOf("Term", "Query") + documentHeaders,
                 rows = termFrequency.mapIndexed { index, row -> listOf(terms[index], "1") + row.map { it.toInt().toString() } }
@@ -81,9 +84,7 @@ class FulltextSearchTaskGenerator {
             ),
             DocumentTable(
                 headers = listOf("Query") + documentHeaders,
-                rows = listOf(
-                    listOf(terms.joinToString(" ")) + cosineSimilarity.map { it.formatToString() }
-                )
+                rows = listOf(listOf(queryText) + cosineSimilarity.map { it.formatToString() })
             ),
         )
     }

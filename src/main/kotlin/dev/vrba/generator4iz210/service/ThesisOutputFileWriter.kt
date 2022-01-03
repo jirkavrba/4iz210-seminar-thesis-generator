@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component
 import java.io.File
 import java.nio.file.Files
 import org.apache.poi.xwpf.usermodel.XWPFDocument
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @Component
 class ThesisOutputFileWriter {
@@ -27,12 +30,38 @@ class ThesisOutputFileWriter {
         // Create documents input(n).txt in the output directory
         inputs.mapIndexed { index, content -> File(directory, "input${index + 1}.txt").writeText(content) }
 
-        val word = File(directory, "fulltextvyhledavac.docx")
-        val regexp = File(directory, "regexp.txt").writeText(extraction.regex)
+        val word = generateFulltextWordDocument(inputs, fulltext)
 
-        generateFulltextWordDocument(inputs, fulltext).copyTo(word, true)
+        File(directory, "regexp.txt").writeText(extraction.regex)
+        File(directory, "products.xml").writeText(extraction.products)
+        File(directory, "products.xsd").writeText(feed.schema)
+        File(directory, "products.json").writeText(feed.json)
+        File(directory, "products.csv").writeText(feed.csv)
 
-        return directory.name
+        word.copyTo(File(directory, "fulltextvyhledavac.docx"), true)
+
+        val zip = File.createTempFile("${xname}_", ".zip")
+        val file = FileOutputStream(zip)
+        val output = ZipOutputStream(file)
+
+        // Zip everything from the temporary directory to the output zip file
+        directory.listFiles()?.forEach {
+            val input = FileInputStream(it)
+            val entry = ZipEntry(it.name)
+
+            output.putNextEntry(entry)
+            output.write(input.readAllBytes())
+
+            input.close()
+        }
+
+        output.close()
+        file.close()
+
+        // Finally, delete the temporary directory
+        directory.delete()
+
+        return zip.absolutePath
     }
 
     private fun generateFulltextWordDocument(inputs: List<String>, fulltext: FulltextSearchTaskOutput): File {

@@ -29,6 +29,8 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.apache.poi:poi:5.1.0")
+    implementation("org.apache.poi:poi-ooxml:5.1.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

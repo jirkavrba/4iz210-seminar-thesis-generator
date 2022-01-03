@@ -13,15 +13,23 @@ import org.springframework.stereotype.Service
 class ThesisGeneratorService(
     private val fulltext: FulltextSearchTaskGenerator,
     private val extraction: ExtractionTaskGenerator,
-    private val feed: ProductFeedTaskGenerator
+    private val feed: ProductFeedTaskGenerator,
+    private val writer: ThesisOutputFileWriter
 ) {
+    fun generateThesis(xname: String, inputs: List<String>, query: Map<String, List<String>>, patterns: List<RegexXmlPattern>): String  {
+        val fulltext = generateFullText(inputs, query)
+        val extraction = generateExtraction(inputs, patterns)
+        val feed = generateProductFeed(extraction.products, patterns)
 
-    fun generateFullText(inputs: List<String>, query: Map<String, List<String>>): FulltextSearchTaskOutput =
+        return writer.writeAndCompressThesis(xname, inputs, fulltext, extraction, feed)
+    }
+
+    private fun generateFullText(inputs: List<String>, query: Map<String, List<String>>): FulltextSearchTaskOutput =
         fulltext.generateTaskOutput(inputs, query)
 
-    fun generateExtraction(inputs: List<String>, patterns: List<RegexXmlPattern>): ExtractionTaskOutput =
+    private fun generateExtraction(inputs: List<String>, patterns: List<RegexXmlPattern>): ExtractionTaskOutput =
         extraction.generateTaskOutput(inputs, patterns)
 
-    fun generateProductFeed(xml: String, patterns: List<RegexXmlPattern>): ProductFeedTaskOutput =
+    private fun generateProductFeed(xml: String, patterns: List<RegexXmlPattern>): ProductFeedTaskOutput =
         feed.generateTaskOutput(xml, patterns)
 }

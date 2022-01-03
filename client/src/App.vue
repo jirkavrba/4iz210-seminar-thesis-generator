@@ -114,9 +114,12 @@
               <input v-model="patterns[pattern].description" class="input">
 
               <label class="label mt-2">XML šablona:</label>
-              <textarea v-model="patterns[pattern].xml" class="textarea is-family-monospace"
-                        placeholder="<RESOLUTION><WIDTH>(1)</WIDTH><HEIGHT>(2)</HEIGHT></RESOLUTION>"
-              ></textarea>
+              <button class="button is-danger mb-2" @click="patterns[pattern].xml.children = []">Reset xml</button>
+
+              <XmlBuilder :root="patterns[pattern].xml"/>
+
+              <p>Pro správné splnění zadání by se měl top-level element jmenovat <code>SHOPITEM</code>.</p>
+              <p>Není možné smazat pouze jeden element / komplexní typ, je potřeba resetova celé schéma.</p>
               <small>Pro referenci group ve výrazu použij syntaxi <code>(1)</code> pro první skupinu, <code>(2)</code>
                 pro druhou...</small>
             </div>
@@ -145,8 +148,11 @@
 </template>
 
 <script>
+import XmlBuilder from "@/XmlBuilder";
+
 export default {
   name: 'App',
+  components: {XmlBuilder},
   data: () => ({
     input: "",
     inputs: [
@@ -184,27 +190,32 @@ export default {
       {
         regex: "(\\d+)x(\\d+)",
         description: "Rozlišení monitoru",
-        xml: [
-          {
-            name: "RESOLUTION",
-            type: "complex",
-            value: "",
-            children: [
-              {
-                name: "WIDTH",
-                type: "integer",
-                value: "(1)",
-                children: []
-              },
-              {
-                name: "HEIGHT",
-                type: "integer",
-                value: "(2)",
-                children: []
-              }
-            ]
-          }
-        ]
+        xml: {
+          name: "SHOPITEM",
+          type: "complex",
+          value: "",
+          children: [
+            {
+              name: "RESOLUTION",
+              type: "complex",
+              value: "",
+              children: [
+                {
+                  name: "WIDTH",
+                  type: "integer",
+                  value: "(1)",
+                  children: []
+                },
+                {
+                  name: "HEIGHT",
+                  type: "integer",
+                  value: "(2)",
+                  children: []
+                }
+              ]
+            }
+          ]
+        }
       }
     ]
   }),
@@ -234,7 +245,7 @@ export default {
       this.patterns.push({
         regex: "",
         description: "",
-        xml: {}
+        xml: []
       });
     },
     patternReference() {
@@ -249,7 +260,7 @@ export default {
         return `<${node.name}>${node.children.map(child => resolveTemplate(child)).join("")}</${node.name}>`;
       }
 
-      const template = pattern.xml.map(root => resolveTemplate(root)).join("");
+      const template = resolveTemplate(pattern.xml);
       const matches = Array.from(document.matchAll(pattern.regex))[0];
 
       return matches.reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), template);

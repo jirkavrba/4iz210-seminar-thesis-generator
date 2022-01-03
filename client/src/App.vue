@@ -12,7 +12,7 @@
     <hr>
 
     <div class="container">
-      <h2 class="title is-3">Vstupní dokumenty</h2>
+      <h2 :class="`title is-3 ${inputs.length >= 3 ? 'has-text-success' : ''}`">Vstupní dokumenty</h2>
       <p>3 - 5 vstupních dokumentů, ze kterých se bude celá semestrálka generovat.</p>
 
       <div v-if="inputs.length < 5">
@@ -40,7 +40,7 @@
       <hr>
 
       <div class="container">
-        <h2 class="title is-3">Hledaný dotaz</h2>
+        <h2 :class="`title is-3 ${query.length >= 5 ? 'has-text-success' : ''}`">Hledaný dotaz</h2>
         <p>Minimálně 5 slov, které se budou hledat v dokumentech.</p>
         <p>Ke každému ze slov je potřeba doplnit varianty (např. "baterií" je varianta slova "baterie") a zkontrolovat,
           že všechny výskyty jsou správně podbarveny.</p>
@@ -81,16 +81,14 @@
       </div>
     </div>
 
-    <div v-if="query.length >= 5">
+    <div v-if="inputs.length >= 3 && query.length >= 5">
       <hr>
 
       <div class="container">
-        <h2 class="title is-3">Regulární výrazy</h2>
+        <h2 :class="`title is-3 ${patterns.length === 5 ? 'has-text-success' : ''}`">Regulární výrazy</h2>
         <p>5 regulárních výrazů, které budou z dokumentů extrahovat informace.</p>
 
-        <button class="button is-info my-5" @click="addPattern()" :disabled="patterns.length >= 5">Přidat regulární
-          výraz
-        </button>
+        <button class="button is-info my-5" @click="addPattern()" :disabled="patterns.length === 5">Přidat regulární výraz</button>
 
         <p v-if="patterns.length === 0" class="has-text-grey-light">Zatím nejsou přidané žádné regulární výrazy</p>
         <div v-else class="mb-5">
@@ -140,6 +138,30 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="inputs.length >= 3 && query.length >= 5 && patterns.length === 5">
+      <hr>
+
+      <div class="hero my-6">
+        <div class="hero-body has-text-centered">
+          <h2 class="title is-2">
+            Tento generátor mě stál poměrně hodně času a úsilí,<br>
+            prosím nespamujte backend opakovanými požadavky.
+          </h2>
+          <a class="button is-info mt-6" href="https://paypal.me/jirivrba" target="_blank">Můžeš mi taky přispět na pivo 🍺</a>
+        </div>
+        <hr>
+        <div class="hero-body has-text-centered">
+          <label class="label">xname:</label>
+          <input type="text" v-model="xname" class="input is-inline" maxlength="6"><br>
+          <small>(slouží pouze pro pojmenování výsledného souboru)</small>
+        </div>
+        <hr>
+        <div class="hero-buttons">
+          <button class="button is-large is-success" :disabled="!(/[a-z0-9]{6}/g.test(xname))">Vygenerovat semestrálku</button>
         </div>
       </div>
     </div>
@@ -217,7 +239,8 @@ export default {
           ]
         }
       }
-    ]
+    ],
+    xname: ""
   }),
   methods: {
     addInput() {
@@ -245,7 +268,12 @@ export default {
       this.patterns.push({
         regex: "",
         description: "",
-        xml: []
+        xml: {
+          name: "SHOPITEM",
+          type: "complex",
+          value: "",
+          children: []
+        }
       });
     },
     patternReference() {

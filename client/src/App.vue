@@ -121,9 +121,8 @@
               <label class="label mt-2">XML šablona:</label>
               <button class="button is-danger mb-2" @click="patterns[pattern].xml.children = []">Reset xml</button>
 
-              <XmlBuilder :root="patterns[pattern].xml"/>
+              <XmlBuilder :root="patterns[pattern].xml" :fixed="true"/>
 
-              <p>Pro správné splnění zadání by se měl top-level element jmenovat <code>SHOPITEM</code>.</p>
               <p>Není možné smazat pouze jeden element / komplexní typ, je potřeba resetova celé schéma.</p>
               <small>Pro referenci group ve výrazu použij syntaxi <code>(1)</code> pro první skupinu, <code>(2)</code>
                 pro druhou...</small>

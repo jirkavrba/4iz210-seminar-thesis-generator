@@ -1,11 +1,14 @@
 <template>
   <div class="notification" style="border: 1px solid black">
-    <code>&lt;</code><input class="input is-inline is-small is-family-monospace" v-model="root.name"><code>&gt;</code>
+    <code v-if="fixed">&lt;{{ root.name }}&gt;</code>
+    <div v-else>
+      <code>&lt;</code><input class="input is-inline is-small is-family-monospace" v-model="root.name"><code>&gt;</code>
+    </div>
     <div class="tag">{{ root.type }}</div>
     <div v-if="root.type !== 'complex'">
       <input v-model="root.value" class="input">
     </div>
-    <XmlBuilder v-else v-for="(child, i) in root.children" :key="i" :root="child"/>
+    <XmlBuilder v-else v-for="(child, i) in root.children" :key="i" :root="child" :fixed="false"/>
     <div v-if="root.type === 'complex'" class="buttons">
       <button class="button is-info is-small" @click="root.children.push({type: 'complex', name: '', value: '', children: []})">complex</button>
       <button class="button is-link is-small" @click="root.children.push({type: 'string', name: '', value: '', children: []})">string</button>
@@ -17,7 +20,7 @@
 <script>
 export default {
   name: "XmlBuilder",
-  props: ["root"],
+  props: ["root", "fixed"],
   mounted() {
     console.log(this.root)
   }

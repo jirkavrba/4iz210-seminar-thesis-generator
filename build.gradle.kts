@@ -48,3 +48,5 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+task("stage").dependsOn("bootJar")

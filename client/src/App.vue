@@ -3,7 +3,7 @@
     <div class="modal is-active" v-if="loading">
       <div class="modal-background"></div>
       <div class="modal-content has-text-centered">
-        <h1 class="title is-1">Generuji semestrálku...</h1>
+        <h1 class="title is-1 has-text-primary">Generuji semestrálku...</h1>
         <p>Nemělo by to trvat déle než pár minut</p>
       </div>
     </div>
@@ -155,10 +155,13 @@
       <div class="hero my-6">
         <div class="hero-body has-text-centered">
           <h2 class="title is-2">
-            Tento generátor mě stál poměrně hodně času a úsilí,<br>
-            prosím nespamujte backend opakovanými požadavky.
+            Tento generátor mě stál poměrně hodně času a úsilí.<br>
+            Je to zcela dobrovolné, ale můžeš mi přispět na pivo 🍺
           </h2>
-          <a class="button is-info mt-6" href="https://paypal.me/jirivrba" target="_blank">Můžeš mi taky přispět na pivo 🍺</a>
+
+          <div class="hero buttons">
+            <a class="button is-info is-large mt-6" href="https://paypal.me/jirivrba" target="_blank">PayPal</a>
+          </div>
         </div>
         <hr>
         <div class="hero-body has-text-centered">
@@ -172,6 +175,10 @@
         </div>
       </div>
     </div>
+    <hr>
+    <footer class="has-text-centered has-text-grey-light">
+      Made with &hearts; and Kotlin
+    </footer>
   </div>
 </template>
 
@@ -226,11 +233,29 @@ export default {
           children: []
         }
       });
+      this.pattern = this.patterns.length - 1;
     },
     async callGenerator() {
       this.loading = true;
 
+      const query = Object.fromEntries(this.query.map(q => [q.term, q.variations]));
+      const data = {
+        xname: this.xname,
+        inputs: this.inputs,
+        query: query,
+        patterns: this.patterns
+      };
+
       // TODO: Call backend api
+      const response = await fetch("/generator", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+
+      console.log(response);
     },
     patternReference() {
       const document = this.inputs[this.reference];
@@ -245,9 +270,13 @@ export default {
       }
 
       const template = resolveTemplate(pattern.xml);
-      const matches = Array.from(document.matchAll(pattern.regex))[0];
+      const matches = Array.from(document.matchAll(pattern.regex));
 
-      return matches.reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), template);
+      if (matches.length === 0) {
+        return "Regulární výraz nevrátil žádné výsledky!"
+      }
+
+      return matches[0].reduce((text, value, index) => text.replaceAll(`(${index})`, value.toString()), template);
     },
     highlight(input) {
       return input.split(/(\s+|[,.])/)

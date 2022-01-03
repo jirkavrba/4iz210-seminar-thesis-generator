@@ -9,5 +9,5 @@ data class RegexXmlPattern(
     @NotBlank
     val description: String,
 
-    // TODO: Add support structure for generating XML nodes and XSD schema
+    val xml: TypedXmlNode,
 )

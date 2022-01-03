@@ -1,5 +1,12 @@
 <template>
   <div id="app">
+    <div class="modal is-active" v-if="loading">
+      <div class="modal-background"></div>
+      <div class="modal-content has-text-centered">
+        <h1 class="title is-1">Generuji semestrálku...</h1>
+        <p>Nemělo by to trvat déle než pár minut</p>
+      </div>
+    </div>
     <div class="container is-flex is-align-items-center">
       <img src="@/assets/wicked.png" alt="Wicked">
 
@@ -161,11 +168,10 @@
         </div>
         <hr>
         <div class="hero-buttons">
-          <button class="button is-large is-success" :disabled="!(/[a-z0-9]{6}/g.test(xname))">Vygenerovat semestrálku</button>
+          <button class="button is-large is-success" :disabled="!(/[a-z0-9]{6}/g.test(xname))" @click="callGenerator()">Vygenerovat semestrálku</button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -240,7 +246,8 @@ export default {
         }
       }
     ],
-    xname: ""
+    xname: "",
+    loading: false,
   }),
   methods: {
     addInput() {
@@ -275,6 +282,11 @@ export default {
           children: []
         }
       });
+    },
+    async callGenerator() {
+      this.loading = true;
+
+      // TODO: Call backend api
     },
     patternReference() {
       const document = this.inputs[this.reference];

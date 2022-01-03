@@ -183,69 +183,13 @@ export default {
   components: {XmlBuilder},
   data: () => ({
     input: "",
-    inputs: [
-      "Notebook - Intel Pentium Quad Core N3510 Bay Trail, multidotykový 10.1\" 1366x768, RAM 4GB, Intel HD Graphics, HDD 500GB 5400 otáček, WiFi, Bluetooth 4.0, Webkamera 1 MPx, 3článková baterie, HDMI, Windows 8 32bit",
-      "Notebook - Intel Pentium 2129Y Ivy Bridge, multidotykový 11.6\" LED 1366x768, RAM 6GB DDR3, Intel HD Graphics, HDD 500GB, WiFi, Bluetooth, webkamera, 3 článková baterie, Windows 8 64-bit (V5-132P-21296G50nbb)",
-      "Ultrabook - Intel Core i3 4010U Haswell, multidotykový 13.3\" LED 1920x1080, RAM 4GB, Intel HD Graphics 4400, SSHD 500GB + 8GB cache pro zrychlení běhu OS, WiFi, Bluetooth 4.0, Webkamera, HDMI, USB 3.0, podsvícená klávesnice, Windows 8 64-bit"
-    ],
+    inputs: [],
     term: "",
     variation: "",
-    query: [
-      {
-        term: "baterie",
-        variations: []
-      },
-      {
-        term: "bluetooth",
-        variations: []
-      },
-      {
-        term: "intel",
-        variations: []
-      },
-      {
-        term: "core",
-        variations: []
-      },
-      {
-        term: "pentium",
-        variations: []
-      }
-    ],
+    query: [],
     pattern: 0,
     reference: 0,
-    patterns: [
-      {
-        regex: "(\\d+)x(\\d+)",
-        description: "Rozlišení monitoru",
-        xml: {
-          name: "SHOPITEM",
-          type: "complex",
-          value: "",
-          children: [
-            {
-              name: "RESOLUTION",
-              type: "complex",
-              value: "",
-              children: [
-                {
-                  name: "WIDTH",
-                  type: "integer",
-                  value: "(1)",
-                  children: []
-                },
-                {
-                  name: "HEIGHT",
-                  type: "integer",
-                  value: "(2)",
-                  children: []
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
+    patterns: [],
     xname: "",
     loading: false,
   }),

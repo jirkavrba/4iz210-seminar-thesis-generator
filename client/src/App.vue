@@ -245,16 +245,23 @@ export default {
         patterns: this.patterns
       };
 
-      // TODO: Call backend api
-      const response = await fetch("/generator", {
+      await fetch("/generator", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
       })
+      .then(response => response.json())
+      .then(response => {
+        window.open(response.link)
+      })
+      .catch(error => {
+        console.error(error);
+        window.alert("Při generování semestrálky došlo k chybě, která byla zalogována do konzole prohlížeče.");
+      });
 
-      console.log(response);
+      this.loading = false;
     },
     patternReference() {
       const document = this.inputs[this.reference];

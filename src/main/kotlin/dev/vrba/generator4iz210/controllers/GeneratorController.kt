@@ -35,10 +35,13 @@ class GeneratorController(private val service: ThesisGeneratorService) {
     fun generateThesis(@Valid @RequestBody request: GenerateThesisRequest): ResponseEntity<*> {
         val fulltext = service.generateFullText(request.inputs, request.query)
         val extraction = service.generateExtraction(request.inputs, request.patterns)
+        val feed = service.generateProductFeed(extraction.products, request.patterns)
 
         return ResponseEntity.ok(
-            mapOf<String, Any>(
-                "fulltext" to fulltext
+            mapOf(
+                "fulltext" to fulltext,
+                "extraction" to extraction,
+                "feed" to feed,
             )
         )
     }

@@ -254,6 +254,7 @@ export default {
       })
       .then(response => response.json())
       .then(response => {
+        console.log(response);
         window.open(response.link)
       })
       .catch(error => {

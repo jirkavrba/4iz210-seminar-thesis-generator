@@ -7,6 +7,8 @@ import dev.vrba.generator4iz210.service.feed.ProductFeedTaskGenerator
 import dev.vrba.generator4iz210.service.feed.ProductFeedTaskOutput
 import dev.vrba.generator4iz210.service.fulltext.FulltextSearchTaskGenerator
 import dev.vrba.generator4iz210.service.fulltext.FulltextSearchTaskOutput
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 
@@ -17,6 +19,9 @@ class ThesisGeneratorService(
     private val feed: ProductFeedTaskGenerator,
     private val writer: ThesisOutputFileWriter,
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(this::class.qualifiedName)
+
     fun generateThesis(xname: String, inputs: List<String>, query: Map<String, List<String>>, patterns: List<RegexXmlPattern>): String  {
         val fulltext = generateFullText(inputs, query)
         val extraction = generateExtraction(inputs, patterns)
@@ -24,6 +29,8 @@ class ThesisGeneratorService(
 
         // Compress everything into a single zip file
         val file = writer.writeAndCompressThesis(xname, inputs, fulltext, extraction, feed)
+
+        logger.info("Generated thesis for $xname with output in ${file.absolutePath}")
 
         // And upload the file to https://transfer.sh
         return uploadFile(file)
@@ -44,6 +51,8 @@ class ThesisGeneratorService(
         val builder = ProcessBuilder().command("curl", "--upload-file", file.absolutePath, "https://transfer.sh/${file.name}")
         val process = builder.start()
         val link = process.inputReader().readLine()
+
+        logger.info("Uploaded ${file.absolutePath} to $link")
 
         process.destroy()
 

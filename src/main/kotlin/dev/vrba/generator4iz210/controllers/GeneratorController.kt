@@ -33,12 +33,10 @@ class GeneratorController(private val service: ThesisGeneratorService) {
 
     @PostMapping
     fun generateThesis(@Valid @RequestBody request: GenerateThesisRequest): ResponseEntity<*> {
-        val link = service.generateThesis(
-            request.xname,
-            request.inputs,
-            request.query,
-            request.patterns
-        )
+
+        // Replace all non-breakable space symbols with a regular spaces as it's used in the tf-idf computation algorithm
+        val inputs = request.inputs.map { it.replace("\\s+".toRegex(), " ") }
+        val link = service.generateThesis(request.xname, inputs, request.query, request.patterns)
 
         return ResponseEntity.ok(mapOf("link" to link))
     }

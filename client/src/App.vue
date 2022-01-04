@@ -160,6 +160,7 @@
 
           <div class="hero buttons">
             <a class="button is-info is-large mt-6" href="https://paypal.me/jirivrba" target="_blank">PayPal</a>
+            <a class="button is-link is-large mt-6">1705593015/3030</a>
           </div>
         </div>
         <hr>

@@ -3,7 +3,7 @@
     <div class="modal is-active" v-if="loading">
       <div class="modal-background"></div>
       <div class="modal-content has-text-centered">
-        <h1 class="title is-1 has-text-primary">Generuji semestrálku...</h1>
+        <h1 class="title is-1 has-text-primary">Generuji vzorovou semestrálku...</h1>
         <p>Nemělo by to trvat déle než pár minut</p>
       </div>
     </div>
@@ -11,7 +11,8 @@
       <img src="@/assets/wicked.png" alt="Wicked">
 
       <div class="is-flex is-flex-direction-column py-6 ml-6">
-        <h1 class="title is-1">Semestrálka z 4iz210 za 60 sekund<span class="has-text-grey-light">*</span></h1>
+        <h1 class="title is-1">Vzorová semestrálka z 4iz210 za 60 sekund<span class="has-text-grey-light">*</span></h1>
+        <h2 class="title is-4 has-text-grey">Tato aplikace složí jenom pro kontrolu výsledků / vzor jak práci vypracovat!</h2>
         <small class="has-text-grey-light">* Well yes, but actually no</small>
       </div>
     </div>
@@ -154,7 +155,7 @@
       <div class="hero my-6">
         <div class="hero-body has-text-centered">
           <h2 class="title is-2">
-            Tento generátor mě stál poměrně hodně času a úsilí.<br>
+            Tato aplikace mě stála poměrně hodně času a úsilí.<br>
             Je to zcela dobrovolné, ale můžeš mi přispět na pivo 🍺
           </h2>
 
@@ -167,11 +168,11 @@
         <div class="hero-body has-text-centered">
           <label class="label">xname:</label>
           <input type="text" v-model="xname" class="input is-inline" maxlength="6"><br>
-          <small>(slouží pouze pro pojmenování výsledného souboru)</small>
+          <small>(slouží pouze pro pojmenování výsledného souboru na serveru)</small>
         </div>
         <hr>
         <div class="hero-buttons">
-          <button class="button is-large is-success" :disabled="!(/[a-z0-9]{6}/g.test(xname))" @click="callGenerator()">Vygenerovat semestrálku</button>
+          <button class="button is-large is-success" :disabled="!(/[a-z0-9]{6}/g.test(xname))" @click="callGenerator()">Vygenerovat vzorovou semestrálku</button>
         </div>
       </div>
     </div>
